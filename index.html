@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Liga EASPORTS 2044/45</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -13,10 +15,12 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--fg)
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 0%,rgba(16,185,129,.04),transparent 60%),radial-gradient(ellipse at 85% 100%,rgba(16,185,129,.02),transparent 50%);pointer-events:none}
 #app{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 10px 100px}
 ::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:var(--card)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-header{padding:16px 0 14px;border-bottom:1px solid var(--border);margin-bottom:14px}
+header{padding:16px 0 14px;border-bottom:1px solid var(--border);margin-bottom:14px;display:flex;align-items:flex-end;justify-content:space-between}
 header h1{font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;letter-spacing:2px;text-transform:uppercase}
 header h1 span{color:var(--accent)}
 .sub{font-size:11px;color:var(--muted);margin-top:2px;letter-spacing:.5px}
+.save-ind{font-size:10px;color:var(--accent);opacity:0;transition:opacity .3s;font-family:'Oswald',sans-serif;letter-spacing:.5px}
+.save-ind.show{opacity:1}
 .tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tabs button{padding:10px 20px;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;border:none;background:0;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.2s}
 .tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
@@ -36,7 +40,6 @@ header h1 span{color:var(--accent)}
 .tw th:nth-child(2){text-align:left;padding-left:8px}
 .tw td{padding:5px 4px;text-align:center;border-bottom:1px solid rgba(28,43,56,.35);font-size:12px;font-variant-numeric:tabular-nums}
 .tw td:nth-child(2){text-align:left;padding-left:8px}
-.tw tr:active td{background:rgba(255,255,255,.03)}
 .pos{font-family:'Oswald',sans-serif;font-weight:500;width:28px}
 .mg{color:var(--accent);font-weight:600}.mr{color:var(--desc);font-weight:600}
 .tc{display:flex;align-items:center;gap:6px;white-space:nowrap}
@@ -44,7 +47,7 @@ header h1 span{color:var(--accent)}
 .bdg img{position:absolute;width:20px;height:20px;object-fit:contain;z-index:1}
 .zc1{background:rgba(37,99,235,.06)}.zc2{background:rgba(217,119,6,.05)}.zc3{background:rgba(124,58,237,.05)}.zd{background:rgba(220,38,38,.05)}
 .zl1{border-left:3px solid var(--chl)}.zl2{border-left:3px solid var(--ell)}.zl3{border-left:3px solid var(--ccl)}.zld{border-left:3px solid var(--desc)}.zb{border-left:3px solid transparent}
-.mr-row{display:flex;align-items:center;gap:4px;padding:9px 10px;border-bottom:1px solid rgba(28,43,56,.3)}
+.mrow{display:flex;align-items:center;gap:4px;padding:9px 10px;border-bottom:1px solid rgba(28,43,56,.3)}
 .si{width:36px;height:30px;text-align:center;background:var(--card2);border:1px solid var(--border);border-radius:5px;color:var(--fg);font-family:'Oswald',sans-serif;font-size:14px;outline:none;transition:.2s}
 .si:focus{border-color:var(--accent)}.si::placeholder{color:var(--muted);opacity:.4}.si.pl{border-color:rgba(16,185,129,.25)}
 .mn{flex:1;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
@@ -88,6 +91,8 @@ header h1 span{color:var(--accent)}
 .arr{width:24px;display:flex;flex-direction:column;gap:0}
 .arr button{width:24px;height:14px;display:flex;align-items:center;justify-content:center;border:none;background:0;color:var(--border);cursor:pointer;font-size:8px}
 .arr button:active{color:var(--fg)}
+.reset-bar{display:flex;gap:6px;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.reset-bar button{font-size:10px;padding:4px 10px}
 @media(max-width:480px){header h1{font-size:17px}.si{width:32px;height:26px;font-size:12px}.mn{font-size:11px}.jb{min-width:36px;height:30px;font-size:11px}.bdg{width:20px;height:20px;font-size:7px}}
 </style>
 </head>
@@ -112,13 +117,71 @@ function B(id,s){
 
 var DM=['VCF:LEV=1:1,OSA:ATH=2:3,BAR:VLL=3:2,CSC:ESP=4:3,SPO:DEP=4:1,SEV:LPA=4:0,RAY:BET=1:0,VIL:GET=3:0,ALA:RMA=0:2,ATM:RSO=1:1','VLL:SEV=1:1,RSO:OSA=1:0,ESP:VCF=7:2,LPA:ATM=0:1,ATH:ALA=3:0,SPO:VIL=1:3,LEV:GET=3:1,BET:CSC=1:0,DEP:BAR=0:3,RMA:RAY=4:0','RAY:ATH=2:1,SEV:DEP=3:1,ATM:VLL=4:0,ALA:RSO=1:1,VIL:LEV=3:1,VCF:BET=2:1,BAR:SPO=3:0,OSA:LPA=3:2,CSC:RMA=0:1,GET:ESP=1:0','VIL:BAR=2:2,LPA:ALA=1:3,BET:GET=3:1,SPO:SEV=2:1,DEP:ATM=3:2,VLL:OSA=1:2,ESP:LEV=0:1,RMA:VCF=1:0,RSO:RAY=1:1,ATH:CSC=0:1','ESP:VIL=2:0,OSA:DEP=0:0,VCF:ATH=2:0,RAY:LPA=1:0,ATM:SPO=3:0,ALA:VLL=1:0,CSC:RSO=0:3,GET:RMA=1:0,LEV:BET=0:1,SEV:BAR=0:1','BET:ESP=1:1,RSO:VCF=1:0,RMA:LEV=0:0,VIL:SEV=5:0,BAR:ATM=2:0,LPA:CSC=1:1,SPO:OSA=1:0,DEP:ALA=1:1,VLL:RAY=1:0,ATH:GET=0:1','VCF:LPA=0:2,ESP:RMA=0:2,CSC:VLL=3:1,BET:VIL=1:1,ATM:SEV=5:1,OSA:BAR=3:1,LEV:ATH=3:1,RAY:DEP=0:0,ALA:SPO=4:2,GET:RSO=2:2','ESP:RSO=1:1,GET:VLL=2:2,CSC:SPO=2:0,OSA:ATM=4:0,ALA:SEV=2:0,LEV:LPA=2:3,RMA:VIL=2:0,BET:ATH=0:0,RAY:BAR=1:2,VCF:DEP=0:2','VIL:ATM=2:2,LPA:GET=0:0,VLL:VCF=0:3,RMA:BET=5:0,ATH:ESP=4:1,BAR:ALA=5:0,SEV:OSA=1:0,DEP:CSC=0:0,SPO:RAY=2:2,RSO:LEV=4:1','VLL:LEV=1:3,LPA:ESP=2:2,DEP:GET=0:0,SEV:RAY=5:1,ATH:RMA=4:3,ATM:ALA=4:0,BAR:CSC=3:0,SPO:VCF=3:1,VIL:OSA=2:0,RSO:BET=2:0','GET:SPO=1:0,LEV:DEP=0:0,BET:LPA=1:2,ALA:OSA=1:0,RMA:RSO=0:0,ATH:VIL=5:0,CSC:SEV=1:0,VCF:BAR=3:2,ESP:VLL=3:0,RAY:ATM=1:1','VIL:ALA=2:0,LPA:RMA=0:1,BAR:GET=2:0,DEP:ESP=0:1,SEV:VCF=2:0,RSO:ATH=2:1,ATM:CSC=4:0,VLL:BET=1:2,OSA:RAY=2:1,SPO:LEV=4:1','ATM:GET=3:2,LPA:RSO=0:4,SEV:LEV=2:2,ALA:CSC=1:1,BAR:ESP=3:1,OSA:VCF=3:1,DEP:RMA=1:4,VLL:ATH=0:0,VIL:RAY=0:0,SPO:BET=1:0','RSO:VIL=4:0,RMA:VLL=3:0,VCF:ATM=2:1,LEV:BAR=1:1,CSC:OSA=3:0,BET:DEP=1:0,GET:SEV=1:0,RAY:ALA=0:1,ESP:SPO=1:1,ATH:LPA=1:1','ATH:DEP=1:2,LPA:VIL=3:2,RSO:VLL=2:0,BET:BAR=1:4,GET:OSA=0:0,CSC:RAY=2:0,LEV:ATM=3:4,RMA:SPO=2:4,VCF:ALA=0:0,ESP:SEV=3:0','SEV:BET=2:0,VIL:CSC=2:0,ATM:ESP=3:1,OSA:LEV=2:3,DEP:RSO=1:0,ALA:GET=1:1,VLL:LPA=7:1,SPO:ATH=1:0,BAR:RMA=1:0,RAY:VCF=3:0','VIL:VCF=3:0,BAR:RSO=1:0,DEP:VLL=0:1,ATM:RMA=1:2,SEV:ATH=2:0,ALA:ESP=1:2,ATM:BET=3:0,CSC:GET=3:0,RAY:LEV=2:0,SPO:LPA=2:2','ESP:OSA=1:3,LPA:DEP=0:2,ATH:BAR=1:1,GET:RAY=2:0,VCF:CSC=1:3,LEV:ALA=2:0,BET:ATM=0:1,RSO:SPO=3:0,VLL:VIL=1:0,RMA:SEV=4:0','BET:ALA=2:1,VLL:SPO=2:0,LPA:BAR=1:2,GET:VCF=0:2,RSO:SEV=1:1,RMA:OSA=3:0,ATH:ATM=2:2,DEP:VIL=1:2,ESP:RAY=1:1,LEV:CSC=3:1','LEV:VCF,ATH:OSA,VLL:BAR,ESP:CSC,DEP:SPO,LPA:SEV,BET:RAY,GET:VIL,RMA:ALA,RSO:ATM','SEV:VLL,OSA:RSO,VCF:ESP,ATM:LPA,ALA:ATH,VIL:SPO,GET:LEV,CSC:BET,BAR:DEP,RAY:RMA','ATH:RAY,DEP:SEV,VLL:ATM,RSO:ALA,LEV:VIL,BET:VCF,SPO:BAR,LPA:OSA,RMA:CSC,ESP:GET','BAR:VIL,ALA:LPA,GET:BET,SEV:SPO,ATM:DEP,OSA:VLL,LEV:ESP,VCF:RMA,RAY:RSO,CSC:ATH','VIL:ESP,DEP:OSA,ATH:VCF,LPA:RAY,SPO:ATM,VLL:ALA,RSO:CSC,RMA:GET,BET:LEV,BAR:SEV','ESP:BET,VCF:RSO,LEV:RMA,SEV:VIL,ATM:BAR,CSC:LPA,OSA:SPO,ALA:DEP,RAY:VLL,GET:ATH','LPA:VCF,RMA:ESP,VLL:CSC,VIL:BET,SEV:ATM,BAR:OSA,ATH:LEV,DEP:RAY,SPO:ALA,RSO:GET','RSO:ESP,VLL:GET,SPO:CSC,ATM:OSA,SEV:ALA,LPA:LEV,VIL:RMA,ATH:BET,BAR:RAY,DEP:VCF','ATM:VIL,GET:LPA,VCF:VLL,BET:RMA,ESP:ATH,ALA:BAR,OSA:SEV,CSC:DEP,RAY:SPO,LEV:RSO','LEV:VLL,ESP:LPA,GET:DEP,RAY:SEV,RMA:ATH,ALA:ATM,CSC:BAR,VCF:SPO,OSA:VIL,BET:RSO','SPO:GET,DEP:LEV,LPA:BET,OSA:ALA,RSO:RMA,VIL:ATH,SEV:CSC,BAR:VCF,VLL:ESP,ATM:RAY','ALA:VIL,RMA:LPA,GET:BAR,ESP:DEP,VCF:SEV,ATH:RSO,CSC:ATM,BET:VLL,RAY:OSA,LEV:SPO','GET:ATM,RSO:LPA,LEV:SEV,CSC:ALA,ESP:BAR,VCF:OSA,RMA:DEP,ATH:VLL,RAY:VIL,BET:SPO','VIL:RSO,VLL:RMA,ATM:VCF,BAR:LEV,OSA:CSC,DEP:BET,SEV:GET,ALA:RAY,SPO:ESP,LPA:ATH','DEP:ATH,VIL:LPA,VLL:RSO,BAR:BET,OSA:GET,RAY:CSC,ATM:LEV,SPO:RMA,ALA:VCF,SEV:ESP','BET:SEV,CSC:VIL,ESP:ATM,LEV:OSA,RSO:DEP,GET:ALA,LPA:VLL,ATH:SPO,RMA:BAR,VCF:RAY','VCF:VIL,RSO:BAR,VLL:DEP,RMA:ATM,ATH:SEV,ESP:ALA,BET:ATM,GET:CSC,LEV:RAY,LPA:SPO','OSA:ESP,DEP:LPA,BAR:ATH,RAY:GET,CSC:VCF,ALA:LEV,ATM:BET,SPO:RSO,VIL:VLL,SEV:RMA','ALA:BET,SPO:VLL,BAR:LPA,VCF:GET,SEV:RSO,OSA:RMA,ATM:ATH,VIL:DEP,RAY:ESP,LEV:SPO'];
 
+/* Estado por defecto */
 var S={md:[],zones:{chl:[1,2,3,4],ell:[5],ccl:[6],desc:[18,19,20]},manual:false,mo:null,tab:'clas',ji:0};
 
 function parseMD(){S.md=DM.map(function(d){return d.split(',').map(function(m){if(m.indexOf('=')>-1){var h=m.split('=');var gs=h[1].split(':');var t=h[0].split(':');return{l:t[0],v:t[1],g1:parseInt(gs[0]),g2:parseInt(gs[1]),played:true}}var t=m.split(':');return{l:t[0],v:t[1],g1:null,g2:null,played:false}})})}
-parseMD();
 
-function save(){try{localStorage.setItem('l2045',JSON.stringify({md:S.md,z:S.zones,man:S.manual,mo:S.mo}))}catch(e){}}
-function load(){try{var d=JSON.parse(localStorage.getItem('l2045'));if(d){S.md=d.md;S.zones=d.z||S.zones;S.manual=!!d.man;S.mo=d.mo||null}}catch(e){}}
+/* ===== PERSISTENCIA ROBUSTA ===== */
+var STORAGE_KEY='liga_easports_2045';
+
+function save(){
+  try{
+    var data=JSON.stringify({
+      md:S.md,
+      z:S.zones,
+      man:S.manual,
+      mo:S.mo,
+      tab:S.tab,
+      ji:S.ji,
+      v:2
+    });
+    localStorage.setItem(STORAGE_KEY,data);
+    showSave();
+  }catch(e){
+    /* Si localStorage falla, intentar con ubicación hash como respaldo */
+    try{
+      var short=JSON.stringify({md:S.md,z:S.zones,man:S.manual,mo:S.mo,tab:S.tab,ji:S.ji,v:2});
+      if(short.length<50000){
+        window.location.hash='d='+encodeURIComponent(short);
+      }
+    }catch(e2){}
+  }
+}
+
+function load(){
+  var data=null;
+  /* Intentar leer localStorage */
+  try{data=JSON.parse(localStorage.getItem(STORAGE_KEY))}catch(e){}
+  /* Si no hay en localStorage, intentar desde hash */
+  if(!data){
+    try{
+      var h=window.location.hash;
+      if(h.indexOf('d=')===0){
+        data=JSON.parse(decodeURIComponent(h.substring(2)));
+        /* Mover a localStorage para futuro */
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+        window.location.hash='';
+      }
+    }catch(e){}
+  }
+  if(!data)return;
+  /* Cargar datos */
+  if(data.md&&data.md.length===38){S.md=data.md}
+  if(data.z){S.zones=data.z}
+  if(typeof data.man==='boolean'){S.manual=data.man}
+  if(data.mo){S.mo=data.mo}
+  if(data.tab==='clas'||data.tab==='jorn'){S.tab=data.tab}
+  if(typeof data.ji==='number'&&data.ji>=0&&data.ji<38){S.ji=data.ji}
+}
+
+function showSave(){
+  var el=document.getElementById('saveInd');
+  if(el){el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show')},1200)}
+}
+
+/* Inicializar: primero parsear por defecto, luego sobrescribir con lo guardado */
+parseMD();
 load();
 
 function calc(){
@@ -130,14 +193,14 @@ function calc(){
 
 function gz(p){var z=S.zones;if(z.chl.indexOf(p)>-1)return{c:'zc1',b:'zl1'};if(z.ell.indexOf(p)>-1)return{c:'zc2',b:'zl2'};if(z.ccl.indexOf(p)>-1)return{c:'zc3',b:'zl3'};if(z.desc.indexOf(p)>-1)return{c:'zd',b:'zld'};return{c:'',b:'zb'}}
 
-function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},1800)}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show')},1800)}
 function openM(h){document.getElementById('mc').innerHTML=h;document.getElementById('modal').classList.add('show')}
 function closeModal(){document.getElementById('modal').classList.remove('show')}
 
 function render(){
   _bc=0;var a=document.getElementById('app');
-  var h='<header><h1>Liga <span>EASPORTS</span></h1><div class="sub">Temporada 2044/2045</div></header>';
-  h+='<div class="tabs"><button class="'+(S.tab==='clas'?'on':'')+'" onclick="S.tab=\'clas\';render()">Clasificación</button><button class="'+(S.tab==='jorn'?'on':'')+'" onclick="S.tab=\'jorn\';render()">Jornadas</button></div>';
+  var h='<header><div><h1>Liga <span>EASPORTS</span></h1><div class="sub">Temporada 2044/2045</div></div><span class="save-ind" id="saveInd"><i class="fas fa-check"></i> Guardado</span></header>';
+  h+='<div class="tabs"><button class="'+(S.tab==='clas'?'on':'')+'" onclick="S.tab=\'clas\';save();render()">Clasificación</button><button class="'+(S.tab==='jorn'?'on':'')+'" onclick="S.tab=\'jorn\';save();render()">Jornadas</button></div>';
   h+=S.tab==='clas'?rTable():rJorn();
   a.innerHTML=h;
   if(S.tab==='jorn'){var el=document.querySelector('.jb.on');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})}
@@ -155,24 +218,28 @@ function rTable(){
     h+='<td style="font-weight:700;font-family:Oswald,sans-serif;font-size:14px">'+r.pts+'</td></tr>';}
   h+='</tbody></table></div></div>';
   h+='<div class="leg"><span><i style="background:var(--chl)"></i>Champions ('+S.zones.chl.length+')</span><span><i style="background:var(--ell)"></i>Europa League ('+S.zones.ell.length+')</span><span><i style="background:var(--ccl)"></i>Conference ('+S.zones.ccl.length+')</span><span><i style="background:var(--desc)"></i>Descenso ('+S.zones.desc.length+')</span></div>';
+  /* Botón reset y exportar/importar */
+  h+='<div class="reset-bar"><button class="btn btn-g" onclick="exportData()"><i class="fas fa-download"></i> Exportar</button><button class="btn btn-g" onclick="importData()"><i class="fas fa-upload"></i> Importar</button><button class="btn" style="background:var(--desc);color:#fff" onclick="resetData()"><i class="fas fa-trash"></i> Reset</button></div>';
   return h;
 }
 
 function rJorn(){
   var h='<div class="jnav">';
-  for(var i=0;i<38;i++){var pl=S.md[i].filter(function(m){return m.played}).length;var dt=pl===10?'f':pl>0?'p':'n';h+='<button class="jb '+(i===S.ji?'on':'')+'" onclick="S.ji='+i+';render()">'+(i+1)+'<span class="dt '+dt+'"></span></button>'}
+  for(var i=0;i<38;i++){var pl=S.md[i].filter(function(m){return m.played}).length;var dt=pl===10?'f':pl>0?'p':'n';h+='<button class="jb '+(i===S.ji?'on':'')+'" onclick="S.ji='+i+';save();render()">'+(i+1)+'<span class="dt '+dt+'"></span></button>'}
   h+='</div><div class="cd fi"><div class="ch"><h2>Jornada '+(S.ji+1)+'</h2><span style="font-size:10px;color:var(--muted)">'+S.md[S.ji].filter(function(m){return m.played}).length+'/10</span></div>';
   var jd=S.md[S.ji];
   for(var mi=0;mi<jd.length;mi++){var m=jd[mi];var wl=m.played?(m.g1>m.g2?'mg':m.g1<m.g2?'mr':''):'';
-    h+='<div class="mr-row"><span style="flex-shrink:0">'+B(m.l,18)+'</span><span class="mn">'+T[m.l]+'</span>';
+    h+='<div class="mrow"><span style="flex-shrink:0">'+B(m.l,18)+'</span><span class="mn">'+T[m.l]+'</span>';
     h+='<input class="si '+(m.played?'pl':'')+'" type="number" min="0" max="99" placeholder="-" value="'+(m.played?m.g1:'')+'" oninput="uS('+S.ji+','+mi+',\'g1\',this.value)" onfocus="this.select()">';
     h+='<span style="color:var(--muted);font-family:Oswald;font-size:11px">-</span>';
     h+='<input class="si '+(m.played?'pl':'')+'" type="number" min="0" max="99" placeholder="-" value="'+(m.played?m.g2:'')+'" oninput="uS('+S.ji+','+mi+',\'g2\',this.value)" onfocus="this.select()">';
     h+='<span class="mn r '+wl+'">'+T[m.v]+'</span><span style="flex-shrink:0">'+B(m.v,18)+'</span>';
     h+='<button class="db" onclick="delM('+S.ji+','+mi+')"><i class="fas fa-times"></i></button></div>'}
-  var used={};jd.forEach(function(m){used[m.l+'|'+m.v]=1});var av=IDS.filter(function(id){return !used[id+'|'+id]&&Object.keys(used).every(function(k){return k.indexOf(id)===-1||k.indexOf(id+'|')===0||k.indexOf('|'+id)===k.length-id.length-1})});
-  var av2=[];var inMatch={};jd.forEach(function(m){inMatch[m.l]=1;inMatch[m.v]=1});av2=IDS.filter(function(id){return !inMatch[id]});
+  var inMatch={};jd.forEach(function(m){inMatch[m.l]=1;inMatch[m.v]=1});
+  var av2=IDS.filter(function(id){return !inMatch[id]});
   if(av2.length>=2){h+='<div class="ab"><select id="aL">'+av2.map(function(id){return '<option value="'+id+'">'+T[id]+'</option>'}).join('')+'</select><span class="vs">VS</span><select id="aV">'+av2.map(function(id,i){return '<option value="'+id+'" '+(i===1?'selected':'')+'>'+T[id]+'</option>'}).join('')+'</select><button onclick="addM()">Añadir</button></div>'}
+  /* Botones de gestión en jornadas */
+  h+='<div class="reset-bar"><button class="btn btn-g" onclick="exportData()"><i class="fas fa-download"></i> Exportar</button><button class="btn btn-g" onclick="importData()"><i class="fas fa-upload"></i> Importar</button></div>';
   h+='</div>';return h;
 }
 
@@ -191,6 +258,60 @@ function openZ(){
   openM(h);
 }
 function savZ(){['chl','ell','ccl','desc'].forEach(function(k){var v=document.getElementById('z_'+k).value;S.zones[k]=v.split(',').map(function(s){return parseInt(s.trim())}).filter(function(n){return !isNaN(n)&&n>=1&&n<=20})});save();closeModal();render();toast('Zonas actualizadas')}
+
+/* ===== EXPORTAR / IMPORTAR ===== */
+function exportData(){
+  var data=JSON.stringify({md:S.md,z:S.zones,man:S.manual,mo:S.mo,tab:S.tab,ji:S.ji,v:2});
+  var blob=new Blob([data],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='liga_2045_backup.json';a.click();
+  URL.revokeObjectURL(url);
+  toast('Datos exportados');
+}
+
+function importData(){
+  var h='<div class="mx-h"><h3>Importar datos</h3><button class="abtn" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="mx-b">';
+  h+='<p style="font-size:11px;color:var(--muted);margin-bottom:12px">Selecciona el archivo de backup (.json) que exportaste antes</p>';
+  h+='<input type="file" accept=".json" id="importFile" style="width:100%;font-size:13px;color:var(--fg)">';
+  h+='<div style="display:flex;gap:6px;margin-top:14px"><button class="btn" style="background:var(--accent);color:#000" onclick="doImport()">Importar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div></div>';
+  openM(h);
+}
+
+function doImport(){
+  var file=document.getElementById('importFile').files[0];
+  if(!file){toast('Selecciona un archivo');return}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result);
+      if(!data.md||data.md.length!==38){toast('Archivo no válido');return}
+      S.md=data.md;
+      if(data.z)S.zones=data.z;
+      if(typeof data.man==='boolean')S.manual=data.man;
+      if(data.mo)S.mo=data.mo;
+      if(data.tab)S.tab=data.tab;
+      if(typeof data.ji==='number')S.ji=data.ji;
+      save();closeModal();render();toast('Datos importados correctamente');
+    }catch(err){toast('Error al leer el archivo')}
+  };
+  reader.readAsText(file);
+}
+
+function resetData(){
+  var h='<div class="mx-h"><h3>Resetear todo</h3><button class="abtn" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="mx-b">';
+  h+='<p style="font-size:13px;margin-bottom:6px">Se borrarán todos los resultados y la clasificación volverá a los datos originales.</p>';
+  h+='<p style="font-size:12px;color:var(--desc);margin-bottom:14px">Esta acción no se puede deshacer.</p>';
+  h+='<div style="display:flex;gap:6px"><button class="btn" style="background:var(--desc);color:#fff" onclick="doReset()">Sí, borrar todo</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div></div>';
+  openM(h);
+}
+
+function doReset(){
+  localStorage.removeItem(STORAGE_KEY);
+  S.zones={chl:[1,2,3,4],ell:[5],ccl:[6],desc:[18,19,20]};
+  S.manual=false;S.mo=null;S.tab='clas';S.ji=0;
+  parseMD();save();closeModal();render();toast('Datos reseteados');
+}
 
 document.getElementById('fab').onclick=function(){
   var mx=0;WAGES.forEach(function(w){if(w.a>mx)mx=w.a});var h='<div class="mx-h"><h3>Masa salarial anual</h3><button class="abtn" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="mx-b"><p style="font-size:11px;color:var(--muted);margin-bottom:10px">Millones de euros</p>';
